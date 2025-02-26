@@ -1,6 +1,6 @@
-package com.example.backproject1.domain.board.Controller;
+package com.example.backproject1.domain.board.controller;
 
-import com.example.backproject1.domain.board.Service.PostService;
+import com.example.backproject1.domain.board.service.PostService;
 import com.example.backproject1.domain.board.dto.PostRequestDTO;
 import com.example.backproject1.domain.board.dto.PostResponseDTO;
 import lombok.RequiredArgsConstructor;

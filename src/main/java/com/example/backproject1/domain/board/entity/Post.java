@@ -1,10 +1,8 @@
 package com.example.backproject1.domain.board.entity;
 
+import com.example.backproject1.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "posts")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Post {
@@ -27,6 +25,10 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -34,4 +36,8 @@ public class Post {
     @Column
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public String getNickname() {
+        return user.getNickname();
+    }
 }

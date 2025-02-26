@@ -1,6 +1,6 @@
-package com.example.backproject1.domain.board.Service;
+package com.example.backproject1.domain.board.service;
 
-import com.example.backproject1.domain.board.Repository.PostRepository;
+import com.example.backproject1.domain.board.repository.PostRepository;
 import com.example.backproject1.domain.board.dto.PostRequestDTO;
 import com.example.backproject1.domain.board.dto.PostResponseDTO;
 import com.example.backproject1.domain.board.entity.Post;

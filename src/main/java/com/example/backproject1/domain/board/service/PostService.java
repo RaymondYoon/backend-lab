@@ -4,6 +4,8 @@ import com.example.backproject1.domain.board.repository.PostRepository;
 import com.example.backproject1.domain.board.dto.PostRequestDTO;
 import com.example.backproject1.domain.board.dto.PostResponseDTO;
 import com.example.backproject1.domain.board.entity.Post;
+import com.example.backproject1.domain.user.entity.User;
+import com.example.backproject1.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     public List<PostResponseDTO> getAllPost() {
-        return postRepository.findAll().stream()
+        return postRepository.findAllWithUser().stream()
                 .map(PostResponseDTO::new)
                 .collect(Collectors.toList());
     }
@@ -30,10 +33,15 @@ public class PostService {
     }
 
     public PostResponseDTO createPost(PostRequestDTO postRequestDTO) {
+        User user = userRepository.findById(postRequestDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저가 존재하지 않습니다."));
+
         Post post = Post.builder()
                 .title(postRequestDTO.getTitle())
                 .content(postRequestDTO.getContent())
+                .user(user)
                 .build();
+
         Post savedPost = postRepository.save(post);
         return new PostResponseDTO(savedPost);
     }
@@ -46,6 +54,7 @@ public class PostService {
                 .id(post.getId())
                 .title(postRequestDTO.getTitle())
                 .content(postRequestDTO.getContent())
+                .user(post.getUser())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .build();

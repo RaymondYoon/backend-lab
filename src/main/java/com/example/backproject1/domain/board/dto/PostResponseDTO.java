@@ -16,12 +16,16 @@ public class PostResponseDTO {
     private Long id;
     private String title;
     private String content;
+    private String nickname;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public PostResponseDTO(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.nickname = post.getNickname();
         this.createdAt = post.getCreatedAt();
+        this.updatedAt = post.getUpdatedAt();
     }
 }

@@ -54,7 +54,7 @@ public class KakaoPayService {
 
         // ✅ 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + KAKAO_ADMIN_KEY);
+        headers.set("Authorization", "SECRET_KEY " + KAKAO_ADMIN_KEY); // ✅ 'KakaoAK' → 'SECRET_KEY'로 변경
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);

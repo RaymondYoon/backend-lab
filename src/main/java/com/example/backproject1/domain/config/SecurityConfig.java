@@ -22,6 +22,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll() // ✅ 회원가입 & 로그인 허용
                         .requestMatchers("/posts/**").permitAll() // ✅ 게시판 API 허용
+                        .requestMatchers("/payment/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 적용

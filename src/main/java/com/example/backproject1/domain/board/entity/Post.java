@@ -38,6 +38,13 @@ public class Post {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private boolean isPaid;
+
+    public void markAsPaid() {
+        this.isPaid = true;
+    }
+
     public String getNickname() {
         return user.getNickname();
     }

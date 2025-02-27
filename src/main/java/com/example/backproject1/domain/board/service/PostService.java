@@ -9,6 +9,7 @@ import com.example.backproject1.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,18 +21,33 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    /**
+     * ✅ 모든 게시글 조회 (결제 여부와 상관없이 전체 조회)
+     */
     public List<PostResponseDTO> getAllPost() {
         return postRepository.findAllWithUser().stream()
                 .map(PostResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
-    public PostResponseDTO getPostById(Long id) {
+    /**
+     * ✅ 특정 게시글 조회 (결제 여부 확인 후 반환)
+     */
+    public PostResponseDTO getPostById(Long id, Long userId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
+
+        // 결제되지 않은 게시글이면 접근 불가
+        if (!post.isPaid() && !post.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("결제 후 열람할 수 있는 게시글입니다.");
+        }
+
         return new PostResponseDTO(post);
     }
 
+    /**
+     * ✅ 새 게시글 작성 (기본적으로 isPaid = false)
+     */
     public PostResponseDTO createPost(PostRequestDTO postRequestDTO) {
         User user = userRepository.findById(postRequestDTO.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저가 존재하지 않습니다."));
@@ -40,12 +56,16 @@ public class PostService {
                 .title(postRequestDTO.getTitle())
                 .content(postRequestDTO.getContent())
                 .user(user)
+                .isPaid(false) // 🔹 기본적으로 결제되지 않음
                 .build();
 
         Post savedPost = postRepository.save(post);
         return new PostResponseDTO(savedPost);
     }
 
+    /**
+     * ✅ 게시글 수정
+     */
     public PostResponseDTO updatePost(Long id, PostRequestDTO postRequestDTO) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
@@ -57,11 +77,27 @@ public class PostService {
                 .user(post.getUser())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
+                .isPaid(post.isPaid()) // 🔹 기존 결제 상태 유지
                 .build();
+
         return new PostResponseDTO(postRepository.save(post));
     }
 
-    public void deletePost(Long id){
+    /**
+     * ✅ 게시글 삭제
+     */
+    public void deletePost(Long id) {
         postRepository.deleteById(id);
+    }
+
+    /**
+     * ✅ 결제 완료 시 게시글 열람 가능하도록 업데이트
+     */
+    @Transactional
+    public void markPostAsPaid(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
+        post.markAsPaid();
+        postRepository.save(post);
     }
 }

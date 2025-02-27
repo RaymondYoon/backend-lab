@@ -37,13 +37,14 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
-        // 결제되지 않은 게시글이면 접근 불가
+        // ✅ 결제 여부 확인
         if (!post.isPaid() && !post.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("결제 후 열람할 수 있는 게시글입니다.");
+            throw new IllegalArgumentException("이 게시글을 보려면 결제가 필요합니다.");
         }
 
         return new PostResponseDTO(post);
     }
+
 
     /**
      * ✅ 새 게시글 작성 (기본적으로 isPaid = false)

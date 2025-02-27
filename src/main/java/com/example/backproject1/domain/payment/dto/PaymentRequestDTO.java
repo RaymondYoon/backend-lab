@@ -8,5 +8,4 @@ import lombok.Setter;
 public class PaymentRequestDTO {
     private Long userId;
     private Long postId;
-    private int amount;
 }

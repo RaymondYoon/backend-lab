@@ -30,7 +30,7 @@ public class KakaoPayService {
     private final String KAKAO_ADMIN_KEY = "DEV5DBE71B40A9C510761820AC919EA7971D5611"; // 🔹 실제 API 키로 변경
 
     /**
-     * ✅ 결제 요청 (게시글 결제)
+     * ✅ 결제 요청 (구독료 = 100원 고정)
      */
     public PaymentResponseDTO requestPayment(PaymentRequestDTO requestDTO) {
         // ✅ 유저와 게시글 찾기
@@ -39,14 +39,14 @@ public class KakaoPayService {
         Post post = postRepository.findById(requestDTO.getPostId())
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
 
-        // ✅ 카카오페이 요청 데이터 구성
+        // ✅ 카카오페이 요청 데이터 구성 (100원 고정)
         Map<String, Object> params = new HashMap<>();
         params.put("cid", "TC0ONETIME");
         params.put("partner_order_id", requestDTO.getPostId());
         params.put("partner_user_id", requestDTO.getUserId());
-        params.put("item_name", post.getTitle());
+        params.put("item_name", "게시글 구독");
         params.put("quantity", 1);
-        params.put("total_amount", requestDTO.getAmount()); // 🔹 요청된 결제 금액 사용
+        params.put("total_amount", 100); // 🔥 100원으로 고정
         params.put("tax_free_amount", 0);
         params.put("approval_url", "http://localhost:8080/payment/success");
         params.put("cancel_url", "http://localhost:8080/payment/cancel");
@@ -73,7 +73,7 @@ public class KakaoPayService {
     }
 
     /**
-     * ✅ 결제 승인 처리 (결제 완료 후 `isPaid` 변경)
+     * ✅ 결제 승인 처리
      */
     @Transactional
     public void approvePayment(Long postId, Long userId) {
@@ -83,14 +83,14 @@ public class KakaoPayService {
                 .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
 
         // ✅ 게시글 결제 완료 처리
-        post.markAsPaid();  // `isPaid = true` 변경
+        post.markAsPaid();
         postRepository.save(post);
 
-        // ✅ 결제 내역 저장
+        // ✅ 결제 내역 저장 (100원으로 고정)
         Payment payment = Payment.builder()
                 .user(user)
                 .post(post)
-                .amount(1000) // 🔹 결제 금액 (고정 값 or requestDTO에서 받아오기)
+                .amount(100) // 🔥 100원으로 고정
                 .paymentStatus("SUCCESS")
                 .build();
 

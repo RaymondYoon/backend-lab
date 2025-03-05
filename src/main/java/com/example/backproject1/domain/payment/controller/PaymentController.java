@@ -13,17 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
     private final KakaoPayService kakaoPayService;
 
-    /**
-     * ✅ 결제 요청 (사용자 ID와 게시글 ID 필요)
-     */
     @PostMapping("/request")
     public ResponseEntity<PaymentResponseDTO> requestPayment(@RequestBody PaymentRequestDTO requestDTO) {
         return ResponseEntity.ok(kakaoPayService.requestPayment(requestDTO));
     }
 
-    /**
-     * ✅ 결제 승인 (카카오페이 결제 완료 후)
-     */
     @PostMapping("/approve/{postId}/{userId}")
     public ResponseEntity<Void> approvePayment(@PathVariable Long postId, @PathVariable Long userId) {
         kakaoPayService.approvePayment(postId, userId);

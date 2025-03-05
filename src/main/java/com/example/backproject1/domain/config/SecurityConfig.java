@@ -20,13 +20,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // ✅ 회원가입 & 로그인 허용
-                        .requestMatchers("/posts/**").permitAll() // ✅ 게시판 API 허용
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/posts/**").permitAll()
                         .requestMatchers("/payment/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 적용
-                .csrf(AbstractHttpConfigurer::disable); // ✅ CSRF 비활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
@@ -34,7 +34,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // ✅ React 허용
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

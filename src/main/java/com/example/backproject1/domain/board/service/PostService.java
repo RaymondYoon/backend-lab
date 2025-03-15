@@ -31,11 +31,10 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
-        if (!post.isPaid() && !post.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("이 게시글을 보려면 결제가 필요합니다.");
+        if(post.getUser().getId().equals(userId) || post.isPaid()) {
+            return new PostResponseDTO(post);
         }
-
-        return new PostResponseDTO(post);
+        throw new IllegalArgumentException("결제 후 열람할 수 있는 게시글입니다.");
     }
 
     public PostResponseDTO createPost(PostRequestDTO postRequestDTO) {

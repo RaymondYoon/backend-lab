@@ -32,8 +32,13 @@ public class PaymentController {
     }
 
     @PostMapping("/approve/{postId}/{userId}")
-    public ResponseEntity<Void> approvePayment(@PathVariable Long postId, @PathVariable Long userId) {
-        kakaoPayService.approvePayment(postId, userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> approvePayment(
+            @PathVariable Long postId,
+            @RequestHeader("Authorization") String token) {
+     String email = jwtTokenProvider.getUserEmail(token.replace("Bearer ", ""));
+     Long userId = userService.getUserIdByEmail(email);
+
+     kakaoPayService.approvePayment(postId, userId);
+     return ResponseEntity.ok().build();
     }
 }

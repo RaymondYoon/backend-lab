@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +32,10 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
-        if(post.getUser().getId().equals(userId) || post.isPaid()) {
+        if (Objects.equals(post.getUser().getId(), userId)){
+            return new PostResponseDTO(post);
+        }
+        if (post.isPaid()){
             return new PostResponseDTO(post);
         }
         throw new IllegalArgumentException("결제 후 열람할 수 있는 게시글입니다.");

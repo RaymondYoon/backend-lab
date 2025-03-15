@@ -18,27 +18,28 @@ public class PaymentController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
-    @PostMapping("/request")
+    @PostMapping("/request/{postId}")
     public ResponseEntity<PaymentResponseDTO> requestPayment(
-            @RequestBody PaymentRequestDTO requestDTO,
+            @PathVariable Long postId,
             @RequestHeader("Authorization") String token) {
 
         String email = jwtTokenProvider.getUserEmail(token.replace("Bearer ", ""));
         Long userId = userService.getUserIdByEmail(email);
-        requestDTO.setUserId(userId);
 
-        PaymentResponseDTO responseDTO = kakaoPayService.requestPayment(requestDTO);
+        PaymentResponseDTO responseDTO = kakaoPayService.requestPayment(postId, userId);
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PostMapping("/approve/{postId}/{userId}")
+    @PostMapping("/approve/{postId}")
     public ResponseEntity<Void> approvePayment(
             @PathVariable Long postId,
             @RequestHeader("Authorization") String token) {
-     String email = jwtTokenProvider.getUserEmail(token.replace("Bearer ", ""));
-     Long userId = userService.getUserIdByEmail(email);
 
-     kakaoPayService.approvePayment(postId, userId);
-     return ResponseEntity.ok().build();
+        String email = jwtTokenProvider.getUserEmail(token.replace("Bearer ", ""));
+        Long userId = userService.getUserIdByEmail(email);
+
+        kakaoPayService.approvePayment(postId, userId);
+        return ResponseEntity.ok().build();
     }
 }
+

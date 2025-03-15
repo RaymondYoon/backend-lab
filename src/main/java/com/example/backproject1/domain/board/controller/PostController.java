@@ -28,8 +28,7 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDTO> getPostById(
             @PathVariable Long id,
-            @RequestHeader("Authorization") String token
-    ) {
+            @RequestHeader("Authorization") String token) {
         String email = jwtTokenProvider.getUserEmail(token.replace("Bearer ", ""));
         Long userId = userService.getUserIdByEmail(email);
 

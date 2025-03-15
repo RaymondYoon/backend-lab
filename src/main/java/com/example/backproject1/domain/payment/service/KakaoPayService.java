@@ -26,7 +26,7 @@ public class KakaoPayService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private final String KAKAO_API_URL = "https://open-api.kakaopay.com/online/v1/payment/ready";
-    private final String KAKAO_ADMIN_KEY = "DEV5DBE71B40A9C510761820AC919EA7971D5611";  // 실 서비스에서는 환경 변수로 관리 필요
+    private final String SECRET_KEY = "DEV5DBE71B40A9C510761820AC919EA7971D5611"; // 환경 변수로 설정할 것
 
     public PaymentResponseDTO requestPayment(Long postId, Long userId) {
         User user = userRepository.findById(userId)
@@ -47,7 +47,7 @@ public class KakaoPayService {
         params.put("fail_url", "http://localhost:8080/payment/fail");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + KAKAO_ADMIN_KEY);
+        headers.set("Authorization", "SECRET_KEY " + SECRET_KEY);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);

@@ -90,7 +90,6 @@ public class KakaoPayService {
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
-
         Map<String, Object> params = new HashMap<>();
         params.put("cid", "TC0ONETIME");
         params.put("tid", tid);
@@ -102,7 +101,7 @@ public class KakaoPayService {
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(params, headers);
 
         try {
-            log.info("💰 [카카오페이 결제 승인 요청] postId={}, userId={}, tid={}, pgToken={}", postId, userId, tid, pgToken);
+            log.info("[카카오페이 결제 승인 요청] postId={}, userId={}, tid={}, pgToken={}", postId, userId, tid, pgToken);
             ResponseEntity<Map> response = restTemplate.exchange(
                     KAKAO_APPROVE_URL, HttpMethod.POST, requestEntity, Map.class);
 
@@ -113,7 +112,7 @@ public class KakaoPayService {
                 throw new RuntimeException("카카오페이 결제 승인 응답이 올바르지 않습니다: " + responseBody);
             }
 
-            // ✅ 결제 승인 성공 시 DB 저장
+            // 결제 승인 성공 시 DB 저장
             post.markAsPaid();
             postRepository.save(post);
 

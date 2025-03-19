@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/payment")
 @RequiredArgsConstructor
@@ -32,34 +34,35 @@ public class PaymentController {
     // 결제 승인 요청 (카카오페이 승인 API 호출)
     @PostMapping("/success")
     public ResponseEntity<String> paymentSuccess(
-            @RequestParam("pg_token") String pgToken,
-            @RequestParam("postId") Long postId,
-            @RequestParam("tid") String tid,
+            @RequestBody Map<String, String> requestBody,
             @RequestHeader("Authorization") String token) {
 
-        System.out.println("Received request to /payment/success");
+        String pgToken = requestBody.get("pg_token");
+        String postIdStr = requestBody.get("postId");
+        String tid = requestBody.get("tid");
+
+        if (pgToken == null || postIdStr == null || tid == null) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다. 필수 값 누락");
+        }
+
+        Long postId = Long.parseLong(postIdStr);
         System.out.println("Received pg_token: " + pgToken);
         System.out.println("Received postId: " + postId);
         System.out.println("Received tid: " + tid);
-        System.out.println("Received Authorization Token: " + token);
 
         try {
             String email = jwtTokenProvider.getUserEmail(token.replace("Bearer ", ""));
             Long userId = userService.getUserIdByEmail(email);
 
-            System.out.println("User Email: " + email);
-            System.out.println("User ID: " + userId);
-
             kakaoPayService.approvePayment(postId, userId, tid, pgToken);
-
-            System.out.println("결제 승인 성공!");
             return ResponseEntity.ok("결제가 성공적으로 완료되었습니다.");
         } catch (Exception e) {
-            System.out.println("결제 승인 오류 발생: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("결제 승인 중 오류 발생: " + e.getMessage());
         }
     }
+
+
 
 
 

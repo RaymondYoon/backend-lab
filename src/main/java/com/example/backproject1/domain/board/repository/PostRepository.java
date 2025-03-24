@@ -12,6 +12,4 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p JOIN FETCH p.user")
     List<Post> findAllWithUser();
-
-    Optional<Post> findByIdAndIsPaid(Long id, boolean isPaid);
 }

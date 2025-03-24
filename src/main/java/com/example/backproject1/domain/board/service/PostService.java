@@ -4,6 +4,7 @@ import com.example.backproject1.domain.board.repository.PostRepository;
 import com.example.backproject1.domain.board.dto.PostRequestDTO;
 import com.example.backproject1.domain.board.dto.PostResponseDTO;
 import com.example.backproject1.domain.board.entity.Post;
+import com.example.backproject1.domain.payment.repository.PaymentRepository;
 import com.example.backproject1.domain.user.entity.User;
 import com.example.backproject1.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
 
     public List<PostResponseDTO> getAllPost() {
         return postRepository.findAllWithUser().stream()
@@ -35,9 +37,12 @@ public class PostService {
         if (Objects.equals(post.getUser().getId(), userId)){
             return new PostResponseDTO(post);
         }
-        if (post.isPaid()){
-            return new PostResponseDTO(post);
-        }
+
+        boolean hasPaid = paymentRepository.existsByPostIdAndUserIdAndPaymentStatus(id, userId, "SUCCESS");
+       if(hasPaid){
+           return new PostResponseDTO(post);
+       }
+
         throw new IllegalArgumentException("결제 후 열람할 수 있는 게시글입니다.");
     }
 
@@ -49,7 +54,6 @@ public class PostService {
                 .title(postRequestDTO.getTitle())
                 .content(postRequestDTO.getContent())
                 .user(user)
-                .isPaid(false)
                 .build();
 
         Post savedPost = postRepository.save(post);
@@ -67,7 +71,6 @@ public class PostService {
                 .user(post.getUser())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
-                .isPaid(post.isPaid())
                 .build();
 
         return new PostResponseDTO(postRepository.save(post));
@@ -77,11 +80,5 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    @Transactional
-    public void markPostAsPaid(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
-        post.markAsPaid();
-        postRepository.save(post);
-    }
+
 }

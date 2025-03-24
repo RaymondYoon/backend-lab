@@ -80,10 +80,6 @@ public class KakaoPayService {
             throw new RuntimeException("카카오페이 결제 요청 중 오류 발생: " + e.getResponseBodyAsString());
         }
     }
-
-    /**
-     * 💰 결제 승인 (Approve)
-     */
     @Transactional
     public void approvePayment(Long postId, Long userId, String tid, String pgToken) {
         Post post = postRepository.findById(postId)
@@ -111,10 +107,6 @@ public class KakaoPayService {
             if (responseBody == null || !responseBody.containsKey("approved_at")) {
                 throw new RuntimeException("카카오페이 결제 승인 응답이 올바르지 않습니다: " + responseBody);
             }
-
-            // 결제 승인 성공 시 DB 저장
-            post.markAsPaid();
-            postRepository.save(post);
 
             Payment payment = Payment.builder()
                     .user(user)

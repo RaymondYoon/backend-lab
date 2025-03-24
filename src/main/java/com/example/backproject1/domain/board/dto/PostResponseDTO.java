@@ -18,7 +18,6 @@ public class PostResponseDTO {
     private String content;
     private String nickname;
     private Long userId;
-    private boolean paid;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -28,7 +27,6 @@ public class PostResponseDTO {
         this.content = post.getContent();
         this.nickname = post.getUser().getNickname();
         this.userId = post.getUser().getId();
-        this.paid = post.isPaid();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
     }

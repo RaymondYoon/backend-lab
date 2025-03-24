@@ -24,9 +24,13 @@ public class PostService {
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
 
-    public List<PostResponseDTO> getAllPost() {
+    public List<PostResponseDTO> getAllPost(Long userId) {
         return postRepository.findAllWithUser().stream()
-                .map(PostResponseDTO::new)
+                .map(post -> {
+                    boolean isPaid = Objects.equals(post.getUser().getId(), userId)
+                            || paymentRepository.existsByPostIdAndUserIdAndPaymentStatus(post.getId(), userId, "SUCCESS");
+                    return new PostResponseDTO(post, isPaid);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -35,12 +39,12 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
         if (Objects.equals(post.getUser().getId(), userId)){
-            return new PostResponseDTO(post);
+            return new PostResponseDTO(post, true);
         }
 
         boolean hasPaid = paymentRepository.existsByPostIdAndUserIdAndPaymentStatus(id, userId, "SUCCESS");
        if(hasPaid){
-           return new PostResponseDTO(post);
+           return new PostResponseDTO(post, true);
        }
 
         throw new IllegalArgumentException("결제 후 열람할 수 있는 게시글입니다.");
@@ -57,7 +61,7 @@ public class PostService {
                 .build();
 
         Post savedPost = postRepository.save(post);
-        return new PostResponseDTO(savedPost);
+        return new PostResponseDTO(savedPost, true);
     }
 
     public PostResponseDTO updatePost(Long id, PostRequestDTO postRequestDTO) {
@@ -73,7 +77,7 @@ public class PostService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        return new PostResponseDTO(postRepository.save(post));
+        return new PostResponseDTO(postRepository.save(post), true);
     }
 
     public void deletePost(Long id) {

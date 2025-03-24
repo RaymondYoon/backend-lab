@@ -20,8 +20,9 @@ public class PostResponseDTO {
     private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean paidByUser;
 
-    public PostResponseDTO(Post post) {
+    public PostResponseDTO(Post post, boolean paidByUser) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
@@ -29,5 +30,6 @@ public class PostResponseDTO {
         this.userId = post.getUser().getId();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
+        this.paidByUser = paidByUser;
     }
 }

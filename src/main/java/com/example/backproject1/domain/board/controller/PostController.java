@@ -21,8 +21,12 @@ public class PostController {
     private final UserService userService;
 
     @GetMapping
-    public List<PostResponseDTO> getAllPosts(){
-        return postService.getAllPost();
+    public ResponseEntity<List<PostResponseDTO>>getAllPosts(
+            @RequestHeader("Authorization") String token
+    ) {
+        String email = jwtTokenProvider.getUserEmail(token.replace("Bearer ", ""));
+        Long userId = userService.getUserIdByEmail(email);
+        return ResponseEntity.ok(postService.getAllPost(userId));
     }
 
     @GetMapping("/{id}")

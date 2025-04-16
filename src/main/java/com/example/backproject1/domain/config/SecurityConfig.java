@@ -23,6 +23,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/posts/**").permitAll()
                         .requestMatchers("/payment/**").permitAll()
+                        .requestMatchers("/ws-chat/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
